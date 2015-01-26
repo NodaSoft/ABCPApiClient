@@ -216,6 +216,39 @@ class TecDoc extends RestClient {
 	}
 
 	/**
+	 * Вовзращает массив сущностей модификаций по идентфикатору производителя (бренда) и идентификатору модели.
+	 *
+	 * @param $modificationId
+	 * @return \NS\ABCPApi\TecDocEntities\Modification
+	 * @throws \Exception
+	 */
+	public function getModificationById($modificationId) {
+		$modifications = Modification::convertToTecDocEntitiesArray(self::getModificationByIdAsArray($modificationId));
+		return $modifications ? current($modifications) : NULL;
+	}
+
+	/**
+	 * Вовзращает список модификаций по идентфикатору производителя (бренда) и идентификатору модели в виде массива.
+	 *
+	 * @param $modificationId
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function getModificationByIdAsArray($modificationId) {
+		$requestVars = $this->getAuthenticationData();
+		$requestVars['modelVariant'] = $modificationId;
+
+		$request = new Request(TecDoc::WEB_SERVICE_URL);
+		$request->setParameters($requestVars)
+			->setOperation('modification');
+		$response = $this->send($request)->getAsArray();
+		if (isset($response['errorCode'])) {
+			throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+		}
+		return $response;
+	}
+
+	/**
 	 * Возвращает дерево категорий для заданной модификации.
 	 *
 	 * @param $modificationId
