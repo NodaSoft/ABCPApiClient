@@ -19,6 +19,12 @@ class Modification extends Base {
 	 */
 	public $name;
 	/**
+	 * Название типа модификации.
+	 *
+	 * @var string
+	 */
+	public $typeName;
+	/**
 	 * Идентификатор модели.
 	 *
 	 * @var int
