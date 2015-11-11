@@ -2,50 +2,34 @@
 namespace NS\ABCPApi\TecDocEntities;
 
 /**
- * @method Model[] convertToTecDocEntitiesArray() static
- * @method Model createByData() static
+ * @method Model[] convertToTecDocEntitiesArray($data) static
+ * @method Model createByData($data) static
  */
-class Model extends Base {
-	/**
-	 * Идентификатор модели.
-	 *
-	 * @var int
-	 */
-	public $id;
-	/**
-	 * Название модели.
-	 *
-	 * @var string
-	 */
-	public $name;
-	/**
-	 * Дата начала выпуска модели.
-	 *
-	 * @var \DateTime|NULL
-	 */
-	public $yearFrom = NULL;
-	/**
-	 * Дата окончания выпуска модели. NULL если еще выпускается.
-	 *
-	 * @var \DateTime|NULL
-	 */
-	public $yearTo = NULL;
+class Model extends Base
+{
+    /**
+     * Идентификатор модели.
+     *
+     * @var int
+     */
+    public $id;
+    /**
+     * Название модели.
+     *
+     * @var string
+     */
+    public $name;
+    /**
+     * Дата начала выпуска модели.
+     *
+     * @var \DateTime
+     */
+    public $yearFrom = null;
+    /**
+     * Дата окончания выпуска модели. NULL если еще выпускается.
+     *
+     * @var \DateTime
+     */
+    public $yearTo = null;
 
-	/**
-	 * Возвращает массив имен свойств типа int
-	 *
-	 * @return string[]
-	 */
-	protected static function getIntProperties() {
-		return array('id');
-	}
-
-	/**
-	 * Возвращает массив имен свойств типа \DateTime
-	 *
-	 * @return string[]
-	 */
-	protected static function getDateTimeProperties() {
-		return array('yearFrom', 'yearTo');
-	}
-} 
+}
