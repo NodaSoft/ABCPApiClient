@@ -19,7 +19,7 @@ use NS\ABCPApi\TecDocEntities\Modification;
  */
 class TecDoc extends RestClient
 {
-    const WEB_SERVICE_URL = 'tecdoc.api.abcp.ru';
+    const DEFAULT_WEB_SERVICE_URL = 'tecdoc.api.abcp.ru';
     /**
      * Значение ключа (USER_KEY) для доступа к TecDoc API
      *
@@ -38,6 +38,35 @@ class TecDoc extends RestClient
      * @var string
      */
     private $userPsw = '';
+    /**
+     * Хост для сервиса TecDoc API
+     *
+     * @var string
+     */
+    private $host = '';
+
+    /**
+     * Возвращает хост для сервиса TecDoc API, либо если хост не задан дефолтный.
+     *
+     * @return string
+     */
+    public function getTecdocHost()
+    {
+        return $this->host === '' ? self::DEFAULT_WEB_SERVICE_URL : $this->host;
+    }
+
+    /**
+     * Устанавливает хост для сервиса TecDoc API
+     *
+     * @param $host
+     * @return TecDoc
+     */
+    public function setTecdocHost($host)
+    {
+        $this->host = $host;
+
+        return $this;
+    }
 
     /**
      * Возвращает значение ключа (USER_KEY) для доступа к TecDoc API
@@ -58,6 +87,7 @@ class TecDoc extends RestClient
     public function setUserKey($userKey)
     {
         $this->userKey = $userKey;
+
         return $this;
     }
 
@@ -80,6 +110,7 @@ class TecDoc extends RestClient
     public function setUserLogin($userLogin)
     {
         $this->userLogin = $userLogin;
+
         return $this;
     }
 
@@ -102,6 +133,7 @@ class TecDoc extends RestClient
     public function setUserPsw($userPsw)
     {
         $this->userPsw = $userPsw;
+
         return $this;
     }
 
@@ -137,13 +169,14 @@ class TecDoc extends RestClient
         if ($carType) {
             $requestVars['carType'] = $carType;
         }
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('manufacturers');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -185,13 +218,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['manufacturerId'] = $manufacturerId;
 
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('models');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -222,13 +256,14 @@ class TecDoc extends RestClient
         $requestVars['manufacturerId'] = $manufacturerId;
         $requestVars['modelId'] = $modelId;
 
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('modifications');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -242,6 +277,7 @@ class TecDoc extends RestClient
     public function getModificationById($modificationId)
     {
         $modifications = Modification::convertToTecDocEntitiesArray(self::getModificationByIdAsArray($modificationId));
+
         return $modifications ? current($modifications) : null;
     }
 
@@ -257,13 +293,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['modelVariant'] = $modificationId;
 
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('modification');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -291,13 +328,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
 
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('tree');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -327,13 +365,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
         $requestVars['categoryId'] = $categoryId;
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('articles');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -360,13 +399,14 @@ class TecDoc extends RestClient
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['articleId'] = $articleId;
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('adaptability');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -396,13 +436,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['number'] = $number;
         $requestVars['type'] = $analogType;
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('analogs');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -429,13 +470,14 @@ class TecDoc extends RestClient
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['articleId'] = $articleId;
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('articleInfo');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
@@ -452,7 +494,8 @@ class TecDoc extends RestClient
      */
     public function getArticleSimplified($modificationId, $categoryId)
     {
-        return ArticleSimplified::convertToTecDocEntitiesArray(self::getArticleSimplifiedAsArray($modificationId, $categoryId));
+        return ArticleSimplified::convertToTecDocEntitiesArray(self::getArticleSimplifiedAsArray($modificationId,
+            $categoryId));
     }
 
     /**
@@ -470,13 +513,14 @@ class TecDoc extends RestClient
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
         $requestVars['categoryId'] = $categoryId;
-        $request = new Request(TecDoc::WEB_SERVICE_URL);
+        $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('articlesSimplified');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
         }
+
         return $response;
     }
 
