@@ -91,7 +91,6 @@ class RestClient
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: ' . $request->getHttpAccept()));
-
         $res = curl_exec($curlHandle);
         $info = curl_getinfo($curlHandle);
         $response = new Response();
@@ -117,8 +116,8 @@ class RestClient
      */
     private function executePost($curlHandle, Request $request)
     {
-        curl_setopt($curlHandle, CURLOPT_URL, $request->getServiceUrl() . $request->getOperation());
-
+        $uri = strpos($request->getOperation(), '/') === 0 ? $request->getOperation() : '/' . $request->getOperation();
+        curl_setopt($curlHandle, CURLOPT_URL, $request->getServiceUrl() . $uri);
         $requestVars = $request->getParameters();
         curl_setopt($curlHandle, CURLOPT_POSTFIELDS, self::convertArray($requestVars));
 

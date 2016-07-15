@@ -2,35 +2,17 @@
 namespace NS\ABCPApi\TecDocEntities;
 
 /**
- * @method Modification[] convertToTecDocEntitiesArray($data) static
- * @method Modification createByData($data) static
+ * @method ModificationAdaptability[] convertToTecDocEntitiesArray($data) static
+ * @method ModificationAdaptability createByData($data) static
  */
-class Modification extends Base
+class ModificationAdaptability extends Base
 {
-    /**
-     * Идентификатор модификации.
-     *
-     * @var int
-     */
-    public $id;
-    /**
-     * Название производителя, модели и модификации через пробел.
-     *
-     * @var string
-     */
-    public $name;
     /**
      * Название модификации.
      *
      * @var string
      */
-    public $modificationName;
-    /**
-     * Идентификатор модели.
-     *
-     * @var int
-     */
-    public $modelId;
+    public $name;
     /**
      * Название модели.
      *
@@ -38,13 +20,7 @@ class Modification extends Base
      */
     public $modelName;
     /**
-     * Идентификатор производителя (бренда)
-     *
-     * @var int
-     */
-    public $manufacturerId;
-    /**
-     * Название производителя (бренда).
+     * Название производителя.
      *
      * @var string
      */
@@ -54,13 +30,13 @@ class Modification extends Base
      *
      * @var \DateTime
      */
-    public $yearFrom;
+    public $yearFrom = null;
     /**
      * Дата окончания выпуска модификации. NULL если еще выпускается.
      *
      * @var \DateTime
      */
-    public $yearTo;
+    public $yearTo = null;
     /**
      * Тип конструкции
      *

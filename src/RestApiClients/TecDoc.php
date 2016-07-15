@@ -7,11 +7,15 @@ use NS\ABCPApi\RestClient\Request;
 use NS\ABCPApi\RestClient\RestClient;
 use NS\ABCPApi\TecDocEntities\AnalogArticle;
 use NS\ABCPApi\TecDocEntities\Article;
+use NS\ABCPApi\TecDocEntities\ArticlePart;
 use NS\ABCPApi\TecDocEntities\ArticleSimplified;
+use NS\ABCPApi\TecDocEntities\AssignedArticleAttributes;
+use NS\ABCPApi\TecDocEntities\Brand;
 use NS\ABCPApi\TecDocEntities\Manufacturer;
 use NS\ABCPApi\TecDocEntities\Model;
 use NS\ABCPApi\TecDocEntities\ModelVariant;
 use NS\ABCPApi\TecDocEntities\Modification;
+use NS\ABCPApi\TecDocEntities\ModificationAdaptability;
 
 /**
  * Клиент для доступа к сервису каталог TecDoc
@@ -58,7 +62,7 @@ class TecDoc extends RestClient
     /**
      * Устанавливает хост для сервиса TecDoc API
      *
-     * @param $host
+     * @param string $host
      * @return TecDoc
      */
     public function setTecdocHost($host)
@@ -81,7 +85,7 @@ class TecDoc extends RestClient
     /**
      * Устанавливает значение ключа (USER_KEY) для доступа к TecDoc API
      *
-     * @param $userKey
+     * @param string $userKey
      * @return TecDoc
      */
     public function setUserKey($userKey)
@@ -104,7 +108,7 @@ class TecDoc extends RestClient
     /**
      * Устанавливает логин (USER_LOGIN) для доступа к TecDoc API
      *
-     * @param $userLogin
+     * @param string $userLogin
      * @return TecDoc
      */
     public function setUserLogin($userLogin)
@@ -127,7 +131,7 @@ class TecDoc extends RestClient
     /**
      * Устанавливает пароль (USER_PSW) для доступа к TecDoc API
      *
-     * @param $userPsw
+     * @param string $userPsw
      * @return TecDoc
      */
     public function setUserPsw($userPsw)
@@ -137,6 +141,13 @@ class TecDoc extends RestClient
         return $this;
     }
 
+    /**
+     * TecDoc constructor.
+     *
+     * @param string $userKey
+     * @param string $userLogin
+     * @param string $userPsw
+     */
     public function __construct($userKey = '', $userLogin = '', $userPsw = '')
     {
         $this->userKey = $userKey;
@@ -181,6 +192,37 @@ class TecDoc extends RestClient
     }
 
     /**
+     * Возвращает массив сущностей производителей (брендов). Можно указать тип автомобиля.
+     *
+     * @return \NS\ABCPApi\TecDocEntities\Brand[]
+     * @throws \Exception
+     */
+    public function getBrands()
+    {
+        return Brand::convertToTecDocEntitiesArray(self::getBrandsAsArray());
+    }
+
+    /**
+     * Возвращает массив производителей (брендов) в виде массива. Можно указать тип автомобиля.
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getBrandsAsArray()
+    {
+        $requestVars = $this->getAuthenticationData();
+        $request = new Request(TecDoc::getTecdocHost());
+        $request->setParameters($requestVars)
+            ->setOperation('brands');
+        $response = $this->send($request)->getAsArray();
+        if (isset($response['errorCode'])) {
+            throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+        }
+
+        return $response;
+    }
+
+    /**
      * Возвращает массив с данными для авторизации.
      *
      * @return array
@@ -197,27 +239,29 @@ class TecDoc extends RestClient
     /**
      * Возвращает массив сущностей Model по идентификатору производителя (бренда).
      *
-     * @param $manufacturerId
-     * @return Model[]
+     * @param int $manufacturerId
+     * @param int $carType
+     * @return \NS\ABCPApi\TecDocEntities\Model[]
      * @throws \Exception
      */
-    public function getModels($manufacturerId)
+    public function getModels($manufacturerId, $carType = CarType::CARS)
     {
-        return Model::convertToTecDocEntitiesArray(self::getModelsAsArray($manufacturerId));
+        return Model::convertToTecDocEntitiesArray(self::getModelsAsArray($manufacturerId, $carType));
     }
 
     /**
      * Возвращает список моделей по идентификатору производителя (бренда) в виде массива.
      *
-     * @param $manufacturerId
+     * @param int $manufacturerId
+     * @param int $carType
      * @return array
      * @throws \Exception
      */
-    public function getModelsAsArray($manufacturerId)
+    public function getModelsAsArray($manufacturerId, $carType = CarType::CARS)
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['manufacturerId'] = $manufacturerId;
-
+        $requestVars['carType'] = $carType;
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('models');
@@ -232,29 +276,33 @@ class TecDoc extends RestClient
     /**
      * Вовзращает массив сущностей модификаций по идентфикатору производителя (бренда) и идентификатору модели.
      *
-     * @param $manufacturerId
-     * @param $modelId
-     * @return Modification[]
+     * @param int $manufacturerId
+     * @param int $modelId
+     * @param int $carType
+     * @return \NS\ABCPApi\TecDocEntities\Modification[]
      * @throws \Exception
      */
-    public function getModifications($manufacturerId, $modelId)
+    public function getModifications($manufacturerId, $modelId, $carType = CarType::CARS)
     {
-        return Modification::convertToTecDocEntitiesArray(self::getModificationsAsArray($manufacturerId, $modelId));
+        return Modification::convertToTecDocEntitiesArray(self::getModificationsAsArray($manufacturerId, $modelId,
+            $carType));
     }
 
     /**
      * Вовзращает список модификаций по идентфикатору производителя (бренда) и идентификатору модели в виде массива.
      *
-     * @param $manufacturerId
-     * @param $modelId
+     * @param int $manufacturerId
+     * @param int $modelId
+     * @param int $carType
      * @return array
      * @throws \Exception
      */
-    public function getModificationsAsArray($manufacturerId, $modelId)
+    public function getModificationsAsArray($manufacturerId, $modelId, $carType = CarType::CARS)
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['manufacturerId'] = $manufacturerId;
         $requestVars['modelId'] = $modelId;
+        $requestVars['carType'] = $carType;
 
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
@@ -270,7 +318,7 @@ class TecDoc extends RestClient
     /**
      * Вовзращает массив сущностей модификаций по идентфикатору производителя (бренда) и идентификатору модели.
      *
-     * @param $modificationId
+     * @param int $modificationId
      * @return \NS\ABCPApi\TecDocEntities\Modification
      * @throws \Exception
      */
@@ -284,7 +332,7 @@ class TecDoc extends RestClient
     /**
      * Вовзращает список модификаций по идентфикатору производителя (бренда) и идентификатору модели в виде массива.
      *
-     * @param $modificationId
+     * @param int $modificationId
      * @return array
      * @throws \Exception
      */
@@ -307,27 +355,29 @@ class TecDoc extends RestClient
     /**
      * Возвращает дерево категорий для заданной модификации.
      *
-     * @param $modificationId
-     * @return ModelVariant[]
+     * @param int $modificationId
+     * @param int $carType
+     * @return \NS\ABCPApi\TecDocEntities\ModelVariant[]
      * @throws \Exception
      */
-    public function getModelVariant($modificationId)
+    public function getModelVariant($modificationId, $carType = CarType::CARS)
     {
-        return ModelVariant::convertToTecDocEntitiesArray(self::getModelVariantAsArray($modificationId));
+        return ModelVariant::convertToTecDocEntitiesArray(self::getModelVariantAsArray($modificationId, $carType));
     }
 
     /**
      * * Возвращает дерево категорий для заданной модификации в виде массива.
      *
-     * @param $modificationId
+     * @param int $modificationId
+     * @param int $carType
      * @return array
      * @throws \Exception
      */
-    public function getModelVariantAsArray($modificationId)
+    public function getModelVariantAsArray($modificationId, $carType = CarType::CARS)
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
-
+        $requestVars['carType'] = $carType;
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('tree');
@@ -342,29 +392,38 @@ class TecDoc extends RestClient
     /**
      * Возвращает список деталей для указанной категории.
      *
-     * @param $modificationId
-     * @param $categoryId
-     * @return Article[]
+     * @param int $modificationId
+     * @param int $categoryId
+     * @param string $brandName
+     * @param int $carType
+     * @return \NS\ABCPApi\TecDocEntities\Article[]
      * @throws \Exception
      */
-    public function getArticles($modificationId, $categoryId)
+    public function getArticles($modificationId, $categoryId, $brandName, $carType = CarType::CARS)
     {
-        return Article::convertToTecDocEntitiesArray(self::getArticlesAsArray($modificationId, $categoryId));
+        return Article::convertToTecDocEntitiesArray(self::getArticlesAsArray($modificationId, $categoryId, $brandName,
+            $carType));
     }
 
     /**
      * Возвращает список деталей для указанной категории в виде массива.
      *
-     * @param $modificationId
-     * @param $categoryId
+     * @param int $modificationId
+     * @param int $categoryId
+     * @param string $brandName
+     * @param int $carType
      * @return array
      * @throws \Exception
      */
-    public function getArticlesAsArray($modificationId, $categoryId)
+    public function getArticlesAsArray($modificationId, $categoryId, $brandName, $carType = CarType::CARS)
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
         $requestVars['categoryId'] = $categoryId;
+        $requestVars['carType'] = $carType;
+        if (!empty($brandName)) {
+            $requestVars['brandNames'] = array($brandName);
+        }
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('articles');
@@ -379,29 +438,103 @@ class TecDoc extends RestClient
     /**
      * Возвращает список модификаций применимых к заданной детали.
      *
-     * @param $articleId
-     * @return Modification[]
+     * @param string $brandName
+     * @param string $number
+     * @param string $manufacturerName
+     * @return string[]
      * @throws \Exception
      */
-    public function getAdaptability($articleId)
+    public function getModelNamesForApplicability($brandName, $number, $manufacturerName)
     {
-        return Modification::convertToTecDocEntitiesArray(self::getAdaptabilityAsArray($articleId));
+        $requestVars = $this->getAuthenticationData();
+        $requestVars['brandName'] = $brandName;
+        $requestVars['number'] = $number;
+        $requestVars['manufacturerName'] = $manufacturerName;
+        $request = new Request(TecDoc::getTecdocHost());
+        $request->setParameters($requestVars)
+            ->setOperation('adaptabilityModels');
+        $response = $this->send($request)->getAsArray();
+        if (isset($response['errorCode'])) {
+            throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Возвращает список производителей применимых к заданной детали.
+     *
+     * @param $brandName
+     * @param $number
+     * @return \NS\ABCPApi\TecDocEntities\Manufacturer[]
+     * @throws \Exception
+     */
+    public function getAdaptabilityManufacturers($brandName, $number)
+    {
+        return Manufacturer::convertToTecDocEntitiesArray(self::getAdaptabilityManufacturersAsArray($brandName,
+            $number));
+    }
+
+    /**
+     * Возвращает список производителей применимых к заданной детали в виде массива.
+     *
+     * @param string $brandName
+     * @param string $number
+     * @return array
+     * @throws \Exception
+     */
+    public function getAdaptabilityManufacturersAsArray($brandName, $number)
+    {
+        $requestVars = $this->getAuthenticationData();
+        $requestVars['brandName'] = $brandName;
+        $requestVars['number'] = $number;
+        $request = new Request(TecDoc::getTecdocHost());
+        $request->setParameters($requestVars)
+            ->setOperation('adaptabilityManufacturers');
+        $response = $this->send($request)->getAsArray();
+        if (isset($response['errorCode'])) {
+            throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Возвращает список модификаций применимых к заданной детали.
+     *
+     * @param string $brandName
+     * @param string $number
+     * @param string $manufacturerName
+     * @param string $modelName
+     * @return \NS\ABCPApi\TecDocEntities\ModificationAdaptability[]
+     * @throws \Exception
+     */
+    public function getAdaptabilityModifications($brandName, $number, $manufacturerName, $modelName)
+    {
+        return ModificationAdaptability::convertToTecDocEntitiesArray(self::getAdaptabilityModificationsAsArray($brandName,
+            $number, $manufacturerName, $modelName));
     }
 
     /**
      * Возвращает список модификаций применимых к заданной детали в виде массива.
      *
-     * @param $articleId
+     * @param string $brandName
+     * @param string $number
+     * @param string $manufacturerName
+     * @param string $modelName
      * @return array
      * @throws \Exception
      */
-    public function getAdaptabilityAsArray($articleId)
+    public function getAdaptabilityModificationsAsArray($brandName, $number, $manufacturerName, $modelName)
     {
         $requestVars = $this->getAuthenticationData();
-        $requestVars['articleId'] = $articleId;
+        $requestVars['brandName'] = $brandName;
+        $requestVars['number'] = $number;
+        $requestVars['manufacturerName'] = $manufacturerName;
+        $requestVars['modelName'] = $modelName;
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
-            ->setOperation('adaptability');
+            ->setOperation('adaptabilityModifications');
         $response = $this->send($request)->getAsArray();
         if (isset($response['errorCode'])) {
             throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
@@ -413,8 +546,8 @@ class TecDoc extends RestClient
     /**
      * Возвращает спискок аналогов по номеру без указания бренда.
      *
-     * @param $number
-     * @param $analogType
+     * @param string $number
+     * @param int $analogType
      * @return AnalogArticle[]
      * @throws \Exception
      */
@@ -426,8 +559,8 @@ class TecDoc extends RestClient
     /**
      * Возвращает спискок аналогов по номеру без указания бренда в виде массива.
      *
-     * @param $number
-     * @param $analogType
+     * @param string $number
+     * @param int $analogType
      * @return array
      * @throws \Exception
      */
@@ -450,7 +583,7 @@ class TecDoc extends RestClient
     /**
      * Возвращает детализированную информацию о детали.
      *
-     * @param $articleId
+     * @param int $articleId
      * @return Article
      * @throws \Exception
      */
@@ -462,7 +595,7 @@ class TecDoc extends RestClient
     /**
      * Возвращает детализированную информацию о детали в виде массива.
      *
-     * @param $articleId
+     * @param int $articleId
      * @return array
      * @throws \Exception
      */
@@ -481,21 +614,105 @@ class TecDoc extends RestClient
         return $response;
     }
 
+    /**
+     * Возвращает информацию о детали с настоящими номерами.
+     *
+     * @param int $articleId
+     * @return ArticlePart[]
+     * @throws \Exception
+     */
+    public function getRealNumberArticles($articleId)
+    {
+        return ArticlePart::convertToTecDocEntitiesArray(self::getRealNumberArticlesAsArray($articleId));
+    }
+
+    /**
+     * Возвращает детали с настоящими номерами в виде массива.
+     *
+     * @param int $articleId
+     * @return array
+     * @throws \Exception
+     */
+    public function getRealNumberArticlesAsArray($articleId)
+    {
+        $requestVars = $this->getAuthenticationData();
+        $requestVars['articleId'] = $articleId;
+        $request = new Request(TecDoc::getTecdocHost());
+        $request->setParameters($requestVars)
+            ->setOperation('realNumberArticles');
+        $response = $this->send($request)->getAsArray();
+        if (isset($response['errorCode'])) {
+            throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Возвращает связанные аттрибуты для детали.
+     *
+     * @param array $articleIdLinkIdPairs
+     * @param int $manufacturerId
+     * @param int $modelId
+     * @param int $modificationId
+     * @return AssignedArticleAttributes[]
+     */
+    public function getAssignedArticleAttributes($articleIdLinkIdPairs, $manufacturerId, $modelId, $modificationId)
+    {
+        return AssignedArticleAttributes::convertToTecDocEntitiesArray(self::getAssignedArticleAttributesAsArray($articleIdLinkIdPairs,
+            $manufacturerId, $modelId, $modificationId));
+    }
+
+    /**
+     * Возвращает связанные аттрибуты для детали в виде массива.
+     *
+     * @param array $articleIdLinkIdPairs
+     * @param int $manufacturerId
+     * @param int $modelId
+     * @param int $modificationId
+     * @return array
+     * @throws \Exception
+     */
+    public function getAssignedArticleAttributesAsArray(
+        $articleIdLinkIdPairs,
+        $manufacturerId,
+        $modelId,
+        $modificationId
+    ) {
+        $requestVars = $this->getAuthenticationData();
+        $requestVars['articleIdPairs'] = $articleIdLinkIdPairs;
+        $requestVars['manufacturerId'] = $manufacturerId;
+        $requestVars['modelId'] = $modelId;
+        $requestVars['modificationId'] = $modificationId;
+        $request = new Request(TecDoc::getTecdocHost());
+        $request->setParameters($requestVars)
+            ->setOperation('assignedArticleAttributes')
+            ->setMethod('POST');
+        $response = $this->send($request)->getAsArray();
+        if (isset($response['errorCode'])) {
+            throw new \Exception(ServiceErrors::getErrorMessageByCode($response['errorCode']), $response['errorCode']);
+        }
+
+        return $response;
+    }
+
 
     /**
      * Возвращает список деталей для указанной категории.
      *
      * Содержит сокращенное количество полей.
      *
-     * @param $modificationId
-     * @param $categoryId
-     * @return Article[]
+     * @param int $modificationId
+     * @param int $categoryId
+     * @param string $brandName
+     * @param int $carType
+     * @return \NS\ABCPApi\TecDocEntities\ArticleSimplified[]
      * @throws \Exception
      */
-    public function getArticleSimplified($modificationId, $categoryId)
+    public function getArticleSimplified($modificationId, $categoryId, $brandName, $carType)
     {
         return ArticleSimplified::convertToTecDocEntitiesArray(self::getArticleSimplifiedAsArray($modificationId,
-            $categoryId));
+            $categoryId, $brandName, $carType));
     }
 
     /**
@@ -503,16 +720,22 @@ class TecDoc extends RestClient
      *
      * Содержит сокращенное количество полей.
      *
-     * @param $modificationId
-     * @param $categoryId
+     * @param int $modificationId
+     * @param int $categoryId
+     * @param string $brandName
+     * @param int $carType
      * @return array
      * @throws \Exception
      */
-    public function getArticleSimplifiedAsArray($modificationId, $categoryId)
+    public function getArticleSimplifiedAsArray($modificationId, $categoryId, $brandName, $carType)
     {
         $requestVars = $this->getAuthenticationData();
         $requestVars['modificationId'] = $modificationId;
         $requestVars['categoryId'] = $categoryId;
+        $requestVars['carType'] = $carType;
+        if (!empty($brandName)) {
+            $requestVars['brandNames[]'] = $brandName;
+        }
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('articlesSimplified');

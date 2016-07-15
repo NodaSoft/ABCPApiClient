@@ -13,7 +13,12 @@ class ArticleSimplified extends Base
      * @var int
      */
     public $id;
-
+    /**
+     * Идентификатор детали.
+     *
+     * @var int
+     */
+    public $articleLinkId;
     /**
      * Номер детали.
      *
