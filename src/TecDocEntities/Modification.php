@@ -128,12 +128,6 @@ class Modification extends Base
      */
     public $powerKW;
     /**
-     * Тоннаж
-     *
-     * @var string
-     */
-    public $tonnage;
-    /**
      * Количество клапанов.
      *
      * @var int
