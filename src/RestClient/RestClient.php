@@ -87,7 +87,7 @@ class RestClient
      */
     private function doExecute($curlHandle, Request $request)
     {
-        curl_setopt($curlHandle, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: ' . $request->getHttpAccept()));
