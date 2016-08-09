@@ -62,12 +62,6 @@ class ModificationAdaptability extends Base
      */
     public $cylinderCapacityCcm;
     /**
-     * Объем двигателя в сантилитрах. (в текдоке не смотря на то что поле называется Liter объем возвращается в сантилитрах)
-     *
-     * @var string
-     */
-    public $cylinderCapacityLiter;
-    /**
      * Тип топлива.
      *
      * @var string
