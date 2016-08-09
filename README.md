@@ -13,7 +13,7 @@ php composer.phar require nodasoft/abcp_api_client:1.2
 
 ```json
   "require": {
-    "nodasoft/abcp_api_client": "1.2"
+    "nodasoft/abcp_api_client": "3.4"
   }
 ```
 
@@ -24,12 +24,6 @@ php composer.phar require nodasoft/abcp_api_client:1.2
 ```php
 require_once '__autoload.php';
 ```
-
-### Изменения в версии 1.2
-
-* форматирование кода приведено в соответствие со стандартом psr-2
-* добавлена сущность ArticleSimplified
-* добавлен метод для получения сокращенных данных по детали: getArticleSimplifiedAsArray($modificationId, $categoryId)
 
 ### Использование
 Перед началом использования клиента необходимо получить данные для авторизации у менеджера платформы abcp
@@ -43,6 +37,12 @@ $tecDocRestClient = new \NS\ABCPApi\RestApiClients\TecDoc();
 $tecDocRestClient->setUserKey('your_userKey)
     ->setUserLogin('your_email')
     ->setUserPsw('your_password');
+```
+
+Установка произвольного адреса:
+
+```php
+$tecDocRestClient->setHost
 ```
 
 Получение списка производителей:
