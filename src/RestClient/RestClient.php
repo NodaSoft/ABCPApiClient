@@ -7,6 +7,13 @@ namespace NS\ABCPApi\RestClient;
 class RestClient
 {
     /**
+     * Содержит информацию по последнему выполненому запросу.
+     *
+     * @var array
+     */
+    private $requestInfo;
+
+    /**
      * Отправляет запрос.
      *
      * @param Request $request
@@ -92,7 +99,7 @@ class RestClient
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: ' . $request->getHttpAccept()));
         $res = curl_exec($curlHandle);
-        $info = curl_getinfo($curlHandle);
+        $this->requestInfo = $info = curl_getinfo($curlHandle);
         $response = new Response();
         $response->setStatus($info['http_code']);
         if (false !== $res) {
@@ -214,4 +221,15 @@ class RestClient
 
         return $this->doExecute($curlHandle, $request);
     }
+
+    /**
+     * Возвращает информацию по последнему запросу.
+     *
+     * @return array
+     */
+    public function getLastRequestInfo()
+    {
+        return $this->requestInfo;
+    }
+
 }
