@@ -49,6 +49,7 @@ $tecDocRestClient->setHost
 
 ```php
 //$carType - тип автомобиля. 0 - все, 1 - легковые, 2- грузовые, 3-малотонажные
+//$motorcyclesFilter - фильтрация по мотоциклам. 0 - все, 1 - только автомобили, 2 - только мотоциклы
 $manufacturers = $tecDocRestClient->getManufacturers($carType);
 ```
 
