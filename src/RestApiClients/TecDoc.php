@@ -1,7 +1,9 @@
 <?php
+
 namespace NS\ABCPApi\RestApiClients;
 
 use NS\ABCPApi\Common\CarType;
+use NS\ABCPApi\Common\Motorcycle;
 use NS\ABCPApi\Common\ServiceErrors;
 use NS\ABCPApi\RestClient\Request;
 use NS\ABCPApi\RestClient\RestClient;
@@ -159,27 +161,29 @@ class TecDoc extends RestClient
      * Возвращает массив сущностей производителей (брендов). Можно указать тип автомобиля.
      *
      * @param int $carType
+     * @param int $motorcyclesFilter
      * @return Manufacturer[]
-     * @throws \Exception
      */
-    public function getManufacturers($carType = CarType::ALL)
+    public function getManufacturers($carType = CarType::ALL, $motorcyclesFilter = Motorcycle::ALL)
     {
-        return Manufacturer::convertToTecDocEntitiesArray(self::getManufacturersAsArray($carType));
+        return Manufacturer::convertToTecDocEntitiesArray(self::getManufacturersAsArray($carType, $motorcyclesFilter));
     }
 
     /**
      * Возвращает массив производителей (брендов) в виде массива. Можно указать тип автомобиля.
      *
      * @param int $carType
+     * @param int $motorcyclesFilter
      * @return array
      * @throws \Exception
      */
-    public function getManufacturersAsArray($carType = CarType::ALL)
+    public function getManufacturersAsArray($carType = CarType::ALL, $motorcyclesFilter = Motorcycle::ALL)
     {
         $requestVars = $this->getAuthenticationData();
         if ($carType) {
             $requestVars['carType'] = $carType;
         }
+        $requestVars['motorcyclesFilter'] = $motorcyclesFilter;
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
             ->setOperation('manufacturers');
