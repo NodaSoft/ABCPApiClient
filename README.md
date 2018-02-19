@@ -6,14 +6,14 @@
 Установка с использованием composer и командной строки:
 
 ```bash
-php composer.phar require nodasoft/abcp_api_client:1.2
+php composer.phar require veloriba/abcp_api_client:1.2
 ```
 
 Установка через конфигурационный файл composer.json:
 
 ```json
   "require": {
-    "nodasoft/abcp_api_client": "3.4"
+    "veloriba/abcp_api_client": "3.4"
   }
 ```
 
