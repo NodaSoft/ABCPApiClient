@@ -218,6 +218,9 @@ class RestClient
     {
         curl_setopt($curlHandle, CURLOPT_URL, $request->getServiceUrl() . $request->getOperation());
         curl_setopt($curlHandle, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        if ($request->getParameters()) {
+            curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $this->buildPostBody($request->getParameters()));
+        }
 
         return $this->doExecute($curlHandle, $request);
     }
