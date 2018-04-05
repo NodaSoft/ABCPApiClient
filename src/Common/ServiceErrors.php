@@ -1,9 +1,10 @@
 <?php
+
 namespace NS\ABCPApi\Common;
 
 class ServiceErrors
 {
-    private static $errors = array(
+    private static $errors = [
         0 => 'Неизвестная ошибка',
         1 => 'Некорректный запрос',
         2 => 'Недостаточно параметров',
@@ -18,7 +19,7 @@ class ServiceErrors
         301 => 'Объект не найден',
         302 => 'Ошибка инициализации кэша',
         303 => 'Ресурс заблокирован'
-    );
+    ];
 
     /**
      * Вовзращает сообщение об ошибке по её коду.

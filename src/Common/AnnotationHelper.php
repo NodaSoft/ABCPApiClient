@@ -1,4 +1,5 @@
 <?php
+
 namespace NS\ABCPApi\Common;
 
 use ReflectionClass;
@@ -15,38 +16,40 @@ class AnnotationHelper
      *
      * @var string[]
      */
-    private static $availableTypes = array(
+    private static $availableTypes = [
         'int',
         'string',
         '\DateTime',
         'boolean',
         'integer',
-    );
+    ];
 
     /**
      * Возвращает список свойств по имени класса.
      *
      * @param $className
      * @return array [string 'name', string 'type']
+     * @throws \ReflectionException
      */
     public static function getPropertiesTypes($className)
     {
         if (!class_exists($className)) {
-            return array();
+            return [];
         }
         $reflection = new ReflectionClass($className);
-        $outputPropertiesNames = array();
+        $outputPropertiesNames = [];
         foreach ($reflection->getProperties() as $onePropertyReflection) {
             $propertyType = self::DEFAULT_PROPERTY_TYPE;
             preg_match('/@var\s+([\\\\]?\w+)/', $onePropertyReflection->getDocComment(), $matches);
             if (isset($matches[1]) && in_array($matches[1], self::$availableTypes, true)) {
                 $propertyType = $matches[1];
             }
-            $outputPropertiesNames[] = array(
+            $outputPropertiesNames[] = [
                 'name' => $onePropertyReflection->getName(),
                 'type' => $propertyType
-            );
+            ];
         }
+
         return $outputPropertiesNames;
     }
 }

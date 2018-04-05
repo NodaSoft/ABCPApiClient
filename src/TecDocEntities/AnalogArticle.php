@@ -1,4 +1,5 @@
 <?php
+
 namespace NS\ABCPApi\TecDocEntities;
 
 /**

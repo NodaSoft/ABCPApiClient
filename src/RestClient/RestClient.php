@@ -1,4 +1,5 @@
 <?php
+
 namespace NS\ABCPApi\RestClient;
 
 /**
@@ -97,7 +98,7 @@ class RestClient
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 120);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, array('Accept: ' . $request->getHttpAccept()));
+        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, ['Accept: ' . $request->getHttpAccept()]);
         $res = curl_exec($curlHandle);
         $this->requestInfo = $info = curl_getinfo($curlHandle);
         $response = new Response();
@@ -140,7 +141,7 @@ class RestClient
      */
     private static function convertArray($data, $path = '')
     {
-        $out = array();
+        $out = [];
         if (is_array($data)) {
             foreach ($data as $k => $value) {
                 $path1 = $path ? $path . "[$k]" : $k;

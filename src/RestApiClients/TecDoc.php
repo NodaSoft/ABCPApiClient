@@ -50,6 +50,45 @@ class TecDoc extends RestClient
      * @var string
      */
     private $host = '';
+    /**
+     * Дополнительные параметры для запроса
+     *
+     * @var array
+     */
+    private $additionalParams = [];
+
+    /**
+     * Возвращает список дополнительных параметров запроса
+     *
+     * @return array
+     */
+    public function getAdditionalParams()
+    {
+        return $this->additionalParams;
+    }
+
+    /**
+     * Устанавливает дополнительные параметры
+     *
+     * @param array $additionalParams
+     * @return $this
+     */
+    public function setAdditionalParams($additionalParams = [])
+    {
+        $this->additionalParams = $additionalParams;
+
+        return $this;
+    }
+
+    /**
+     * Добавляет дополнительные параметры
+     *
+     * @param array $additionalParams
+     */
+    public function addAdditionalParams($additionalParams)
+    {
+        $this->additionalParams[] = $additionalParams;
+    }
 
     /**
      * Возвращает хост для сервиса TecDoc API, либо если хост не задан дефолтный.
@@ -163,6 +202,7 @@ class TecDoc extends RestClient
      * @param int $carType
      * @param int $motorcyclesFilter
      * @return Manufacturer[]
+     * @throws \Exception
      */
     public function getManufacturers($carType = CarType::ALL, $motorcyclesFilter = Motorcycle::ALL)
     {
@@ -233,11 +273,13 @@ class TecDoc extends RestClient
      */
     private function getAuthenticationData()
     {
-        return array(
+        $authData = [
             'userlogin' => $this->getUserLogin(),
             'userpsw' => $this->getUserPsw(),
             'userkey' => $this->getUserKey()
-        );
+        ];
+
+        return array_merge($authData, $this->additionalParams);
     }
 
     /**
@@ -426,7 +468,7 @@ class TecDoc extends RestClient
         $requestVars['categoryId'] = $categoryId;
         $requestVars['carType'] = $carType;
         if (!empty($brandName)) {
-            $requestVars['brandNames'] = array($brandName);
+            $requestVars['brandNames'] = [$brandName];
         }
         $request = new Request(TecDoc::getTecdocHost());
         $request->setParameters($requestVars)
@@ -660,6 +702,7 @@ class TecDoc extends RestClient
      * @param int $modelId
      * @param int $modificationId
      * @return AssignedArticleAttributes[]
+     * @throws \Exception
      */
     public function getAssignedArticleAttributes($articleIdLinkIdPairs, $manufacturerId, $modelId, $modificationId)
     {

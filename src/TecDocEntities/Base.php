@@ -1,4 +1,5 @@
 <?php
+
 namespace NS\ABCPApi\TecDocEntities;
 
 use NS\ABCPApi\Common\AnnotationHelper;
@@ -22,14 +23,16 @@ class Base
         $className = get_called_class();
         $entity = new $className;
         if ($entity instanceof Base) {
-            $collection = array();
+            $collection = [];
             foreach ($data as $oneItem) {
                 if (is_array($oneItem)) {
                     $collection[] = $entity::createByData($oneItem);
                 }
             }
+
             return $collection;
         }
+
         return null;
     }
 
@@ -38,6 +41,7 @@ class Base
      *
      * @param array $data
      * @return Base|mixed
+     * @throws \ReflectionException
      */
     public static function createByData(array $data)
     {
@@ -47,7 +51,7 @@ class Base
         foreach ($properties as $oneProperty) {
             if (isset($data[$oneProperty['name']])) {
                 switch (true) {
-                    case in_array($oneProperty['type'], array('int', 'integer')):
+                    case in_array($oneProperty['type'], ['int', 'integer']):
                         $instance->{$oneProperty['name']} = (int)$data[$oneProperty['name']];
                         break;
                     case $oneProperty['type'] === '\DateTime':
@@ -61,6 +65,7 @@ class Base
                 }
             }
         }
+
         return $instance;
     }
 
@@ -76,8 +81,10 @@ class Base
             $date = new \DateTime();
             $date->setDate(substr($yearMonth, 0, 4), substr($yearMonth, -2), 1);
             $date->setTime(0, 0, 0);
+
             return $date;
         }
+
         return null;
     }
 
