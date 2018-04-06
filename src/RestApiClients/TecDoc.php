@@ -85,10 +85,13 @@ class TecDoc extends RestClient
      *
      * @param string $key
      * @param string $value
+     * @return TecDoc
      */
     public function addAdditionalParams($key, $value)
     {
         $this->additionalParams[$key] = $value;
+
+        return $this;
     }
 
     /**
