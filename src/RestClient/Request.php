@@ -22,6 +22,13 @@ class Request
     protected $httpAccept = 'application/xml';
 
     /**
+     * Заголовок HTTP Content-Type.
+     *
+     * @var string
+     */
+    protected $contentType = 'application/x-www-form-urlencoded';
+
+    /**
      * Метод запрос (GET, POST и т.д.).
      *
      * @var string
@@ -92,6 +99,30 @@ class Request
 
         return $this;
     }
+
+    /**
+     * Вовзращает http заголовок Content-Type.
+     *
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * Устанавливает http заголовок Content-Type. Возвращает текущий экземпляр класса.
+     *
+     * @param string $contentType
+     * @return Request Current object ($this).
+     */
+    public function setContentType($contentType)
+    {
+        $this->contentType = $contentType;
+
+        return $this;
+    }
+
 
     /**
      * Возвращает метод отправки запроса (GET, POST и т.д.).

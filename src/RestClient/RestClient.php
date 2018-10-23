@@ -98,7 +98,10 @@ class RestClient
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 120);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, ['Accept: ' . $request->getHttpAccept()]);
+        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, [
+            'Accept: ' . $request->getHttpAccept(),
+            'Content-Type: ' . $request->getContentType(),
+        ]);
         $res = curl_exec($curlHandle);
         $this->requestInfo = $info = curl_getinfo($curlHandle);
         $response = new Response();
