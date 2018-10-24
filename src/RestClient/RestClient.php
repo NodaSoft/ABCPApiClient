@@ -95,14 +95,10 @@ class RestClient
      */
     private function doExecute($curlHandle, Request $request)
     {
-        curl_setopt($curlHandle, CURLINFO_HEADER_OUT, true);
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 120);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curlHandle, CURLOPT_HEADER, true);
-        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, [
-            'Accept: ' . $request->getHttpAccept(),
-            'Content-Type: ' . $request->getContentType(),
-        ]);
+        curl_setopt($curlHandle, CURLOPT_HTTPHEADER, ['Accept: ' . $request->getHttpAccept()]);
         $res = curl_exec($curlHandle);
         $this->requestInfo = $info = curl_getinfo($curlHandle);
         $response = new Response();
@@ -131,7 +127,7 @@ class RestClient
         $uri = strpos($request->getOperation(), '/') === 0 ? $request->getOperation() : '/' . $request->getOperation();
         curl_setopt($curlHandle, CURLOPT_URL, $request->getServiceUrl() . $uri);
         $requestVars = $request->getParameters();
-        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, http_build_query(self::convertArray($requestVars)));
+        curl_setopt($curlHandle, CURLOPT_POSTFIELDS, self::convertArray($requestVars));
 
         return $this->doExecute($curlHandle, $request);
     }
